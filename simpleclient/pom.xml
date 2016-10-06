@@ -13,10 +13,16 @@
 	<name>SimpleClient</name>
 	<description>The simpleclient demonstrates making connections to Teiid through both, a Driver and a DataSource</description>
 
+    <properties>
+        <service.host>localhost</service.host>
+        <service.port>31000</service.port>
+        <service.scheme>mm</service.scheme>
+    </properties>
 	<dependencies>
 	        <dependency>
                         <groupId>org.jboss.teiid</groupId>
-                        <artifactId>teiid-jdbc</artifactId>
+                        <artifactId>teiid</artifactId>
+                        <classifier>jdbc</classifier>
 	        </dependency>
 	</dependencies>
 
@@ -45,10 +51,11 @@
                     <classpathScope>test</classpathScope>
                     <mainClass>JDBCClient</mainClass>
                                     <arguments>
-                                        <argument>localhost</argument>
-                                        <argument>31000</argument>
+                                        <argument>${service.host}</argument>
+                                        <argument>${service.port}</argument>
                                         <argument>${vdb}</argument>
                                         <argument>${sql}</argument>
+                                        <argument>${service.scheme}</argument>
                                     </arguments>                   
                 </configuration>
             </plugin>                              

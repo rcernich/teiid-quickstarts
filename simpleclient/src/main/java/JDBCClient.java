@@ -40,36 +40,37 @@ public class JDBCClient {
 	
 	public static void main(String[] args) throws Exception {
 		if (args.length < 4) {
-			System.out.println("usage: JDBCClient <host> <port> <vdb> <sql-command>");
+			System.out.println("usage: JDBCClient <host> <port> <vdb> <sql-command> [<connection-scheme>]");
 			System.exit(-1);
 		}
 
 		System.out.println("Executing using the TeiidDriver");
-		boolean isSelect = execute(getDriverConnection(args[0], args[1], args[2]), args[3]);
+		boolean isSelect = execute(getDriverConnection(args[0], args[1], args[2], args.length > 4 ? args[4] : "mm"), args[3]);
 
         // only if its a Select will the SQL be performed again using TeiidDataSource
 		if (isSelect) {
 			System.out.println("-----------------------------------");
 			System.out.println("Executing using the TeiidDataSource");
 			// this is showing how to make a Data Source connection. 
-			execute(getDataSourceConnection(args[0], args[1], args[2]), args[3]);
+			execute(getDataSourceConnection(args[0], args[1], args[2], args.length > 4 ? "mms".equals(args[4]) : false), args[3]);
 		}
 	}
 	
-	static Connection getDriverConnection(String host, String port, String vdb) throws Exception {
-		String url = "jdbc:teiid:"+vdb+"@mm://"+host+":"+port+";showplan=on"; //note showplan setting
+	static Connection getDriverConnection(String host, String port, String vdb, String scheme) throws Exception {
+		String url = "jdbc:teiid:"+vdb+"@"+scheme+"://"+host+":"+port+";showplan=on"; //note showplan setting
 		Class.forName("org.teiid.jdbc.TeiidDriver");
 		
 		return DriverManager.getConnection(url,getUserName(), getPassword());		
 	}
 	
-	static Connection getDataSourceConnection(String host, String port, String vdb) throws Exception {
+	static Connection getDataSourceConnection(String host, String port, String vdb, boolean useSecure) throws Exception {
 		TeiidDataSource ds = new TeiidDataSource();
 		ds.setDatabaseName(vdb);
 		ds.setUser(getUserName());
 		ds.setPassword(getPassword());
 		ds.setServerName(host);
 		ds.setPortNumber(Integer.valueOf(port));
+		ds.setSecure(useSecure);
 		
 		ds.setShowPlan("on"); //turn show plan on
 		
